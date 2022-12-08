@@ -102,6 +102,11 @@ def epsilon_greedy(Q,
         # Use epsilon and all input arguments of epsilon_greedy you see fit
         # It is recommended you use the np.random module
         action = None
+        if np.random.uniform(0, 1, 1) < (1-epsilon):
+            action = np.nanargmax(Q[state])
+        else:
+            ran = np.random.randint(0, len(all_actions))
+            action = all_actions[ran]
         # ADD YOUR CODE SNIPPET BETWEEN EX 3.1
 
     elif eps_type == 'linear':
@@ -111,6 +116,13 @@ def epsilon_greedy(Q,
         # use the ScheduleLinear class
         # It is recommended you use the np.random module
         action = None
+        d_e = epsilon_final - epsilon_initial
+        e_t = d_e * t/current_total_steps
+        if np.random.uniform(0, 1, 1) < (1-epsilon):
+            action = np.nanargmax(Q[state])
+        else:
+            ran = np.random.randint(0, len(all_actions))
+            action = all_actions[ran]
         # ADD YOUR CODE SNIPPET BETWEENEX  3.2
 
     else:
@@ -194,7 +206,15 @@ class PlayerControllerRL(PlayerController, FishesModelling):
 
                 # ADD YOUR CODE SNIPPET BETWEEN EX 2.1 and 2.2
                 # Chose an action from all possible actions
-                action = np.nanargmax(Q[s_current])
+                # action = np.nanargmax(Q[s_current])
+                action = epsilon_greedy(Q,
+                   s_current,
+                   list_pos,
+                   current_total_steps,
+                   self.epsilon_initial,
+                   self.epsilon_final,
+                   anneal_timesteps=10000,
+                   eps_type="constant")
                 # ADD YOUR CODE SNIPPET BETWEEN EX 2.1 and 2.2
 
                 # ADD YOUR CODE SNIPPET BETWEEN EX 5
