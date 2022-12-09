@@ -116,9 +116,12 @@ def epsilon_greedy(Q,
         # use the ScheduleLinear class
         # It is recommended you use the np.random module
         action = None
-        d_e = epsilon_final - epsilon_initial
-        e_t = d_e * t/current_total_steps
-        if np.random.uniform(0, 1, 1) < (1-epsilon):
+        #d_e = epsilon_final - epsilon_initial
+        #e_t = d_e * current_total_steps/anneal_timesteps + epsilon_initial
+        schedule = ScheduleLinear(anneal_timesteps, epsilon_final, epsilon_initial)
+        e_t = schedule.value(current_total_steps)
+
+        if np.random.uniform(0, 1, 1) < (1-e_t):
             action = np.nanargmax(Q[state])
         else:
             ran = np.random.randint(0, len(all_actions))
@@ -214,7 +217,7 @@ class PlayerControllerRL(PlayerController, FishesModelling):
                    self.epsilon_initial,
                    self.epsilon_final,
                    anneal_timesteps=10000,
-                   eps_type="constant")
+                   eps_type="linear")
                 # ADD YOUR CODE SNIPPET BETWEEN EX 2.1 and 2.2
 
                 # ADD YOUR CODE SNIPPET BETWEEN EX 5
@@ -370,5 +373,8 @@ class ScheduleLinear(object):
     def value(self, t):
         # ADD YOUR CODE SNIPPET BETWEEN EX 3.2
         # Return the annealed linear value
-        return self.initial_p
+        d_e = self.final_p - self.initial_p
+        e_t = d_e * t / self.schedule_timesteps + self.initial_p
+
+        return e_t
         # ADD YOUR CODE SNIPPET BETWEEN EX 3.2
